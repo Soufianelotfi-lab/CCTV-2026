@@ -1,0 +1,88 @@
+{
+    "screen_id": 0,
+    "display": {
+        "width": 2560,
+        "height": 1440,
+        "x_offset": 0,
+        "y_offset": 0,
+        "connector": "DP-0"
+    },
+    "camera_defaults": {
+        "format": "UYVY",
+        "capture_width": 1920,
+        "capture_height": 1080,
+        "framerate": 30
+    },
+    "scenes": [
+        {
+            "name": "Plein écran — Cam 0",
+            "type": "fullscreen",
+            "cameras": [
+                {"device": 0}
+            ]
+        },
+        {
+            "name": "Grille 2 caméras (Cam 0 + Cam 1)",
+            "type": "grid",
+            "layout": {"cols": 2, "rows": 1},
+            "cameras": [
+                {"device": 0},
+                {"device": 1}
+            ]
+        },
+        {
+            "name": "Grille 4 caméras",
+            "type": "grid",
+            "layout": {"cols": 2, "rows": 2},
+            "cameras": [
+                {"device": 0},
+                {"device": 1},
+                {"device": 2},
+                {"device": 3}
+            ]
+        },
+        {
+            "name": "Cam 0 — Rotation 90°",
+            "type": "fullscreen",
+            "cameras": [
+                {"device": 0, "flip_method": 3}
+            ]
+        },
+        {
+            "name": "Cam 0 — Zoom x2",
+            "type": "fullscreen",
+            "cameras": [
+                {"device": 0, "crop": {"left": 480, "right": 480, "top": 270, "bottom": 270}}
+            ]
+        },
+        {
+            "name": "Grille 8 caméras (toutes)",
+            "type": "grid",
+            "layout": {"cols": 4, "rows": 2},
+            "cameras": [
+                {"device": 0},
+                {"device": 1},
+                {"device": 2},
+                {"device": 3},
+                {"device": 4},
+                {"device": 5},
+                {"device": 6},
+                {"device": 7}
+            ]
+        },
+        {
+            "name": "Plein écran — Cam 1",
+            "type": "fullscreen",
+            "cameras": [
+                {"device": 1}
+            ]
+        },
+        {
+            "name": "Plein écran — Cam 2",
+            "type": "fullscreen",
+            "cameras": [
+                {"device": 2}
+            ]
+        }
+    ]
+}
