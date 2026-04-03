@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x /home/k-challenge/Desktop/multi-cam-display/start_display.sh)",
+      "Bash(gst-inspect-1.0)",
+      "Bash(gst-inspect-1.0 nvdrmvideosink:*)",
+      "Bash(modetest -c)",
+      "Bash(gst-launch-1.0 videotestsrc:*)",
+      "Bash(ls /tmp/.X*-lock)",
+      "Read(//run/user/**)",
+      "Read(//run/gdm3/**)",
+      "Bash(DISPLAY=:1 XAUTHORITY=/run/user/1000/gdm/Xauthority xrandr)",
+      "Bash(gst-inspect-1.0 nv3dsink:*)"
+    ]
+  }
+}
