@@ -4,7 +4,6 @@
 import json
 import os
 import logging
-import time
 from screen_worker import ScreenWorker
 
 logger = logging.getLogger("scene_manager")
@@ -19,7 +18,6 @@ class SceneManager:
         self.current_index = 0
         self.worker = None
         self._switching = False
-
         self._load_config()
 
     def _load_config(self):
@@ -60,11 +58,15 @@ class SceneManager:
         self._switching = True
         try:
             scene = self.scenes[index]
+<<<<<<< HEAD:multi-cam-display/scene_manager.py
 
             if self.worker.is_running():
                 self.worker.stop()
                 time.sleep(0.3)
 
+=======
+            self.worker.stop()  # Always stop; synchronous — cameras guaranteed released
+>>>>>>> V_H:multi_cam_display/scene_manager.py
             success = self.worker.start(scene)
             if success:
                 self.current_index = index

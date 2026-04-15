@@ -12,7 +12,11 @@ gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GLib
 
 from scene_manager import SceneManager
+<<<<<<< HEAD
 from keyboard_listener import KeyboardListener
+=======
+from gpio_listener import GPIOListener
+>>>>>>> V_H
 
 
 def setup_logging(verbose=False):
@@ -30,7 +34,11 @@ class MultiCamApp:
         self.display = display
         self.loop = None
         self.scene_manager = None
+<<<<<<< HEAD
         self.keyboard = None
+=======
+        self.gpio = None
+>>>>>>> V_H
 
     def run(self):
         Gst.init(None)
@@ -38,17 +46,25 @@ class MultiCamApp:
         self.scene_manager = SceneManager(self.config_path, self.display)
         self.loop = GLib.MainLoop()
 
+<<<<<<< HEAD
         self.keyboard = KeyboardListener(
             on_next=self._on_next,
             on_prev=self._on_prev,
             on_reload=self._on_reload,
             on_quit=self._on_quit
         )
+=======
+        self.gpio = GPIOListener(on_next=self._on_next)
+>>>>>>> V_H
 
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
 
+<<<<<<< HEAD
         self.keyboard.start()
+=======
+        self.gpio.start()
+>>>>>>> V_H
         GLib.timeout_add(500, self._start_first_scene)
 
         try:
@@ -70,6 +86,7 @@ class MultiCamApp:
     def _on_next(self):
         GLib.idle_add(self._do_next)
 
+<<<<<<< HEAD
     def _on_prev(self):
         GLib.idle_add(self._do_prev)
 
@@ -79,11 +96,14 @@ class MultiCamApp:
     def _on_quit(self):
         GLib.idle_add(self._do_quit)
 
+=======
+>>>>>>> V_H
     def _do_next(self):
         self.scene_manager.next_scene()
         self._log_status()
         return False
 
+<<<<<<< HEAD
     def _do_prev(self):
         self.scene_manager.prev_scene()
         self._log_status()
@@ -96,6 +116,8 @@ class MultiCamApp:
         self._log_status()
         return False
 
+=======
+>>>>>>> V_H
     def _do_quit(self):
         logger.info("Shutting down...")
         self.loop.quit()
@@ -112,9 +134,14 @@ class MultiCamApp:
         GLib.idle_add(self._do_quit)
 
     def _cleanup(self):
+<<<<<<< HEAD
         if self.keyboard:
             self.keyboard.stop()
             self.keyboard.restore_terminal()
+=======
+        if self.gpio:
+            self.gpio.stop()
+>>>>>>> V_H
         if self.scene_manager:
             self.scene_manager.stop()
         logger.info("Application stopped")

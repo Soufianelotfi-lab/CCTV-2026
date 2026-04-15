@@ -10,7 +10,14 @@
       "Read(//run/user/**)",
       "Read(//run/gdm3/**)",
       "Bash(DISPLAY=:1 XAUTHORITY=/run/user/1000/gdm/Xauthority xrandr)",
+<<<<<<< HEAD
       "Bash(gst-inspect-1.0 nv3dsink:*)"
+=======
+      "Bash(gst-inspect-1.0 nv3dsink:*)",
+      "Bash(pdflatex -interaction=nonstopmode rapport.tex)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(sudo cp:*)"
+>>>>>>> V_H
     ]
   }
 }

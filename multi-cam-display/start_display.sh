@@ -2,17 +2,36 @@
 set -uo pipefail
 
 DISPLAY_NUM=":0"
+<<<<<<< HEAD
 LOCK_FILE="/tmp/.X0-lock"
 XORG_CONF="/etc/X11/xorg-jetson.conf"
 XAUTH_FILE="/tmp/.Xauthority-jetson"
 
+=======
+DISPLAY_IDX="0"
+LOCK_FILE="/tmp/.X${DISPLAY_IDX}-lock"
+SOCKET="/tmp/.X11-unix/X${DISPLAY_IDX}"
+XORG_CONF="/etc/X11/xorg-jetson.conf"
+XAUTH_FILE="/tmp/.Xauthority-jetson"
+
+cleanup_stale() {
+    echo "Cleaning up stale X files for ${DISPLAY_NUM}..."
+    sudo rm -f "${LOCK_FILE}" "${SOCKET}"
+}
+
+>>>>>>> V_H
 handle_existing_lock() {
     local lock_pid
     lock_pid=$(cat "${LOCK_FILE}" | tr -d '[:space:]')
 
     if ! kill -0 "${lock_pid}" 2>/dev/null; then
+<<<<<<< HEAD
         echo "Stale X lock file found, removing..."
         rm -f "${LOCK_FILE}"
+=======
+        echo "Stale X lock file found (PID ${lock_pid} dead), cleaning up..."
+        cleanup_stale
+>>>>>>> V_H
         return 1
     fi
 
@@ -29,6 +48,7 @@ handle_existing_lock() {
     fi
 }
 
+<<<<<<< HEAD
 start_xorg() {
     if [ ! -f "${XORG_CONF}" ]; then
         echo "ERROR: ${XORG_CONF} not found." >&2
@@ -38,6 +58,28 @@ start_xorg() {
 
     touch "${XAUTH_FILE}"
     chmod 600 "${XAUTH_FILE}"
+=======
+handle_stale_socket() {
+    # Socket exists but no lock file — stale socket from a previous crash
+    echo "Stale X socket found without lock file, cleaning up..."
+    cleanup_stale
+}
+
+start_xorg() {
+    if [ ! -f "${XORG_CONF}" ]; then
+        SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        LOCAL_CONF="${SCRIPT_DIR}/xorg-jetson.conf"
+        if [ ! -f "${LOCAL_CONF}" ]; then
+            echo "ERROR: ${XORG_CONF} not found and ${LOCAL_CONF} is missing." >&2
+            exit 1
+        fi
+        echo "Installing ${LOCAL_CONF} → ${XORG_CONF} ..."
+        sudo cp "${LOCAL_CONF}" "${XORG_CONF}"
+    fi
+
+    touch "${XAUTH_FILE}"
+    chmod 644 "${XAUTH_FILE}"
+>>>>>>> V_H
     if command -v mcookie &>/dev/null; then
         xauth -f "${XAUTH_FILE}" add "${DISPLAY_NUM}" . "$(mcookie)" 2>/dev/null || true
     else
@@ -65,6 +107,12 @@ start_xorg() {
 
 if [ -f "${LOCK_FILE}" ]; then
     handle_existing_lock || start_xorg
+<<<<<<< HEAD
+=======
+elif [ -S "${SOCKET}" ]; then
+    handle_stale_socket
+    start_xorg
+>>>>>>> V_H
 else
     start_xorg
 fi
@@ -77,4 +125,9 @@ if ! DISPLAY="${DISPLAY_NUM}" XAUTHORITY="${XAUTH_FILE}" xrandr 2>/dev/null | gr
     exit 1
 fi
 
+<<<<<<< HEAD
+=======
+DISPLAY="${DISPLAY_NUM}" XAUTHORITY="${XAUTH_FILE}" xset s off -dpms 2>/dev/null || true
+
+>>>>>>> V_H
 echo "Display :0 ready on DP-0"
