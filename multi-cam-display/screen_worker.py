@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """GStreamer pipeline management for fullscreen camera display on DP-0."""
 
-import threading
 import gi
 gi.require_version('Gst', '1.0')
-from gi.repository import Gst, GLib
+from gi.repository import Gst
 import logging
 
 logger = logging.getLogger("screen_worker")
@@ -131,11 +130,7 @@ class ScreenWorker:
         self.pipeline = None
         pipeline.get_bus().remove_signal_watch()
         pipeline.set_state(Gst.State.NULL)
-        threading.Thread(
-            target=pipeline.get_state,
-            args=(5 * Gst.SECOND,),
-            daemon=True
-        ).start()
+        pipeline.get_state(5 * Gst.SECOND)  # Block until NULL — cameras released before returning
 
     def is_running(self):
         if self.pipeline is None:

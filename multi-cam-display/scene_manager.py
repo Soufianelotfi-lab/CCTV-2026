@@ -3,7 +3,6 @@
 
 import json
 import os
-import time
 import logging
 from screen_worker import ScreenWorker
 
@@ -59,11 +58,7 @@ class SceneManager:
         self._switching = True
         try:
             scene = self.scenes[index]
-
-            if self.worker.is_running():
-                self.worker.stop()
-                time.sleep(0.05)
-
+            self.worker.stop()  # Always stop; synchronous — cameras guaranteed released
             success = self.worker.start(scene)
             if success:
                 self.current_index = index

@@ -33,11 +33,8 @@ ssh user@jetson
 # Aller dans le dossier du projet
 cd ~/multi_cam_display
 
-# Lancer le script de configuration (désactive le bureau, installe les paquets)
+# Lancer le script de configuration (désactive le bureau, installe les paquets, copie xorg-jetson.conf)
 sudo bash jetson_setup.sh
-
-# Copier la config Xorg minimale
-sudo cp xorg-jetson.conf /etc/X11/xorg-jetson.conf
 
 # Redémarrer la Jetson
 sudo reboot
@@ -105,10 +102,8 @@ Après le redémarrage : l'écran affiche à nouveau le bureau GNOME.
 sudo systemctl set-default multi-user.target
 sudo systemctl stop gdm3
 
-# Copier la config Xorg si elle a été écrasée
-sudo cp ~/multi_cam_display/xorg-jetson.conf /etc/X11/xorg-jetson.conf
-
 # Relancer sans reboot (ou rebooter pour être propre)
+# start_display.sh recopie automatiquement xorg-jetson.conf si besoin
 sudo reboot
 ```
 
@@ -208,6 +203,6 @@ Définit les scènes disponibles et les paramètres caméra.
 | `Failed to start pipeline` | Tester `ls /dev/video*`. Vérifier les droits : `sudo usermod -aG video $USER` |
 | `io-mode=4` erreur | Caméra sans DMA-Buf : remplacer `io-mode=4` par `io-mode=2` dans `screen_worker.py` |
 | `Config file not found` | Vérifier le répertoire courant : `cd ~/multi_cam_display` |
-| Écran noir après 10 min | `sudo cp xorg-jetson.conf /etc/X11/xorg-jetson.conf` puis relancer `bash start_display.sh` |
+| Écran noir après 10 min | Relancer `bash start_display.sh` (recopie `xorg-jetson.conf` automatiquement si besoin) |
 | Vérifier Xorg | `ps aux \| grep Xorg` ou `ls /tmp/.X0-lock` |
 | FPS faible | `sudo nvpmodel -m 0 && sudo jetson_clocks` |

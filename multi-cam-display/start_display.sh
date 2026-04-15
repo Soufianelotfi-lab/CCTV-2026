@@ -2,17 +2,24 @@
 set -uo pipefail
 
 DISPLAY_NUM=":0"
-LOCK_FILE="/tmp/.X0-lock"
+DISPLAY_IDX="0"
+LOCK_FILE="/tmp/.X${DISPLAY_IDX}-lock"
+SOCKET="/tmp/.X11-unix/X${DISPLAY_IDX}"
 XORG_CONF="/etc/X11/xorg-jetson.conf"
 XAUTH_FILE="/tmp/.Xauthority-jetson"
+
+cleanup_stale() {
+    echo "Cleaning up stale X files for ${DISPLAY_NUM}..."
+    sudo rm -f "${LOCK_FILE}" "${SOCKET}"
+}
 
 handle_existing_lock() {
     local lock_pid
     lock_pid=$(cat "${LOCK_FILE}" | tr -d '[:space:]')
 
     if ! kill -0 "${lock_pid}" 2>/dev/null; then
-        echo "Stale X lock file found, removing..."
-        rm -f "${LOCK_FILE}"
+        echo "Stale X lock file found (PID ${lock_pid} dead), cleaning up..."
+        cleanup_stale
         return 1
     fi
 
@@ -29,11 +36,22 @@ handle_existing_lock() {
     fi
 }
 
+handle_stale_socket() {
+    # Socket exists but no lock file — stale socket from a previous crash
+    echo "Stale X socket found without lock file, cleaning up..."
+    cleanup_stale
+}
+
 start_xorg() {
     if [ ! -f "${XORG_CONF}" ]; then
-        echo "ERROR: ${XORG_CONF} not found." >&2
-        echo "       sudo cp xorg-jetson.conf /etc/X11/xorg-jetson.conf" >&2
-        exit 1
+        SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        LOCAL_CONF="${SCRIPT_DIR}/xorg-jetson.conf"
+        if [ ! -f "${LOCAL_CONF}" ]; then
+            echo "ERROR: ${XORG_CONF} not found and ${LOCAL_CONF} is missing." >&2
+            exit 1
+        fi
+        echo "Installing ${LOCAL_CONF} → ${XORG_CONF} ..."
+        sudo cp "${LOCAL_CONF}" "${XORG_CONF}"
     fi
 
     touch "${XAUTH_FILE}"
@@ -65,6 +83,9 @@ start_xorg() {
 
 if [ -f "${LOCK_FILE}" ]; then
     handle_existing_lock || start_xorg
+elif [ -S "${SOCKET}" ]; then
+    handle_stale_socket
+    start_xorg
 else
     start_xorg
 fi

@@ -12,7 +12,7 @@ gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GLib
 
 from scene_manager import SceneManager
-from keyboard_listener import KeyboardListener
+from gpio_listener import GPIOListener
 
 
 def setup_logging(verbose=False):
@@ -30,7 +30,7 @@ class MultiCamApp:
         self.display = display
         self.loop = None
         self.scene_manager = None
-        self.keyboard = None
+        self.gpio = None
 
     def run(self):
         Gst.init(None)
@@ -38,17 +38,12 @@ class MultiCamApp:
         self.scene_manager = SceneManager(self.config_path, self.display)
         self.loop = GLib.MainLoop()
 
-        self.keyboard = KeyboardListener(
-            on_next=self._on_next,
-            on_prev=self._on_prev,
-            on_reload=self._on_reload,
-            on_quit=self._on_quit
-        )
+        self.gpio = GPIOListener(on_next=self._on_next)
 
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
 
-        self.keyboard.start()
+        self.gpio.start()
         GLib.timeout_add(500, self._start_first_scene)
 
         try:
@@ -70,29 +65,8 @@ class MultiCamApp:
     def _on_next(self):
         GLib.idle_add(self._do_next)
 
-    def _on_prev(self):
-        GLib.idle_add(self._do_prev)
-
-    def _on_reload(self):
-        GLib.idle_add(self._do_reload)
-
-    def _on_quit(self):
-        GLib.idle_add(self._do_quit)
-
     def _do_next(self):
         self.scene_manager.next_scene()
-        self._log_status()
-        return False
-
-    def _do_prev(self):
-        self.scene_manager.prev_scene()
-        self._log_status()
-        return False
-
-    def _do_reload(self):
-        self.scene_manager.stop()
-        self.scene_manager.reload_config()
-        self.scene_manager.start_current()
         self._log_status()
         return False
 
@@ -112,9 +86,8 @@ class MultiCamApp:
         GLib.idle_add(self._do_quit)
 
     def _cleanup(self):
-        if self.keyboard:
-            self.keyboard.stop()
-            self.keyboard.restore_terminal()
+        if self.gpio:
+            self.gpio.stop()
         if self.scene_manager:
             self.scene_manager.stop()
         logger.info("Application stopped")
